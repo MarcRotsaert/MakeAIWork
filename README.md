@@ -13,7 +13,8 @@ Directory <i>notebooks</i> contains Jupyter notebooks that can be used in Jupyte
 ---
 
 ## Python AI Workspace Installation
-Watch [instruction videos at YouTube](https://studio.youtube.com/channel/UCGBzbt5f8_AKVY9TYSEDZWw) 
+Watch [instruction videos at YouTube](https://youtube.com/playlist?list=PLf5zREwsIjUNQ2y4TGi9F0uXQZ1B08d_v) 
+
 
 ### Clone this Git repository
 To be able to use this repository and handover your code, you need to have remote access to Github.
@@ -60,11 +61,68 @@ Make sure you select "Checkout as-is, commit Unix-style line endings" during the
 
 <li>
 
-**Install [GitHub CLI](https://cli.github.com/) (MacOS and Linux)**
+**Install [iterm2](https://iterm2.com/) (MacOS)**
+
+```bash
+brew install iterm2
+```
+
+</li>
+
+<li>
+
+**Install zsh (MacOS and Ubuntu)**
+
+<ul>
+
+<li>
+
+Install [zsh](https://www.howtogeek.com/362409/what-is-zsh-and-why-should-you-use-it-instead-of-bash/) on MacOS using
+
+```bash
+brew install zsh
+```
+
+In Ubuntu
+```bash
+sudo apt install zsh 
+```
+
+</li>
+
+<li>
+
+Add iTerm2 path to zsh profile
+ 
+ ```bash
+echo "eval \"\$(homebrew/bin/brew shellenv)\"" >> ~/.zshrc
+```
+
+</li>
+ 
+ <li>
+ 
+**(Optional) Install oh-my-zsh (MacOS and Ubuntu)**
+  
+```bash
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+```
+
+</li>
+
+</ul>
+
+</li>
+
+<li>
+
+**Install [GitHub CLI](https://cli.github.com/) (MacOS and Ubuntu)**
 
 ```bash
 brew install gh
 ```
+ 
+[Installation instructions on Ubuntu](https://www.techiediaries.com/install-github-cli-ubuntu-20/)
 
 </li>
 
@@ -123,15 +181,6 @@ gh repo clone git@github.com:{your_github_username}/MakeAIWork.git
 otherwise enter the following command in your (git)bash shell after replacing {your_github_username} with your GitHub username.
 ```sh
 git clone git@github.com:{your_github_username}/MakeAIWork.git
-```
-
-</li>
-
-<li>
-
-**Add execution permissions to the shell scripts**
-```bash
-chmod +x sh/*.sh
 ```
 
 </li>
@@ -223,7 +272,7 @@ wsl –set-default-version 2
 
 </ol>
 
-### Install [Docker](https://learndocker.online/introduction/the-whats-and-whys/what-is-docker/) Desktop (Windows and MacOS)
+### Install Docker Desktop (Windows and MacOS)
 To facilitate you with a managed portable [isolated](https://learndocker.online/introduction/the-whats-and-whys/what-are-containers/) [Development Environment]((https://learndocker.online/introduction/the-whats-and-whys/why-docker-for-devs)), we provide a Docker image in which all dependencies are preinstalled. We prefer Docker for isolation since it is a much lighter solution than [Virtual Machine](https://learndocker.online/introduction/the-whats-and-whys/containers-vs-vms/). 
 
 <ol>
@@ -231,6 +280,8 @@ To facilitate you with a managed portable [isolated](https://learndocker.online/
 <li>
 
 **Download and install [Docker Desktop](https://www.docker.com/get-started)**
+
+[Download for Mac with Apple M* chip](https://docs.docker.com/desktop/mac/apple-silicon/)
 
 <li>
 
@@ -262,12 +313,50 @@ If that works, you can run the scripts to start the Docker container as describe
 
 <li>
 
-**Enable the webbrowser to open automatically after starting a webservice (Windows only)**
+**Install python to enable the webbrowser to open automatically after starting a webservice**
 
-Install [python](https://www.python.org/downloads/release/python-3105/). 
+<ol>
+
+<li>
+
+Install [python](https://www.python.org/downloads/release/python-3105/)
+
+</li>
+
+<li>
+
+Install venv (Ubuntu)
+
+```sh
+sudo apt install python3.10-venv
+```
+
+</li>
+
+<li>
+
+Create virtual Python environment
+
+```sh
+python3 -m venv .
+```
+
+</li>
+
+<li>
+
+Activate venv
+```sh
+source bin/activate
+```
+</li>
+
+</ol>
 
 ***NOTE***
 We only run Python directly on the host to sue the webbrowser module. For ad Docker Workaround on Windows, you need to install the Ubuntu in Windows sub-system.
+
+</li>
 
 </li>
 
@@ -318,6 +407,77 @@ Follow the instructions at [Collaborate with Live Share](https://code.visualstud
 
 </ol>
 
+## Run Python scripts with Graphical UI in Docker (MacOS only)
+
+<ol>
+
+<li>
+
+**Install XQuartz X.Org Window System**
+On the MacOS host, we use xquartz to provide us with a MacOS X Window System.<br>
+Download and install [xquartz](https://www.xquartz.org/)<br>
+Log out and Log in to activate the changes the terminal
+
+</li>
+
+<li>
+
+**Configure XQuartz to allow network connections from host**
+
+<ol>
+
+<li>
+
+Get your IP address
+
+Run the following command in the terminal to see your IP address
+
+```bash
+ifconfig en0 | grep 'inet ' | awk '{print $2}'
+```
+
+<li>
+
+Start XQuartz
+
+```bash
+open -a XQuartz
+```
+
+which will open a XQuartz terminal in which you enter
+
+```sh
+xhost {Your IP}
+```
+
+Click on the word 'XQuartz' on the top left of your screen (next to the Apple logo) and select <i>Preference</i>. Open the tab 
+<i>Security</i> and check 'Allow connections from network clients' 
+
+</li>
+
+</ol>
+
+</li>
+
+<li>
+
+**Install Socat**
+The graphical Python script runs with a Linux X Window System in a Docker container. To connect this to the MacOS X Window System on the host we use the [command line utility socat](https://linux.die.net/man/1/socat). 
+
+```bash
+brew install socat
+```
+
+</li>
+
+<li>
+
+**Test by running a Python script with GUI**
+
+</li>
+
+</ol>
+
 ### Ubuntu in Windows sub-system (alternative for Windows users)
 Instead of Git bash and Docker, you can install a complete Ubuntu terminal environment with Windows Subsystem for Linux (WSL). Although Ubuntu can be installed in minutes, you lack the benefit of all preinstalled Python modules in an isolated container. 
 
@@ -331,7 +491,7 @@ Download and install [Ubuntu LTS on WSL2](https://ubuntu.com/tutorials/install-u
 
 <li>
 
-Install pip
+Install Miniconda
 
 </li>
 
@@ -355,7 +515,13 @@ Install Jupyterlab
 Students use a containerised Python environment running a [Docker](https://www.docker.com/) image. 
 
 ### Files available to the container
-The project files are accessible in the containerised runtime environment by means of a bind mount between the current (host)directory project and/or notebooks on your laptop and <i>/home/student/project</i> and/or <i>/home/student/nontebooks</i> at the container instance.
+The project files are accessible in the containerised runtime environment by means of a bind mount between the directories from the current path ($PWD) on your laptop (host) and the directories in the HOME directory at the container instance:
+<ul>
+<li>${PWD}/notebooks -> $HOME/notebooks</li>
+<li>${PWD}/pics      -> $HOME/pics</li>
+<li>${PWD}/projects  -> $HOME/projects</li>
+<li>${PWD}/scripts   -> $HOME/scripts</li>
+</ul>
 <br>
 
 ***CAUTION***
@@ -363,7 +529,7 @@ The project files are accessible in the containerised runtime environment by mea
 You can remove both container and image without data loss but be aware that files removed from the container directory /project will also be removed from you host directory project.
 <br>
 
-### Start a Python container
+### Scripts to use Python
 Docker scripts can be found in <i>docker</i>. Each of the scripts below will call <i>docker/run/miw_container.sh</i> to facilitate the following runtimes:
 
 <ul>
@@ -409,7 +575,11 @@ sh/bash.sh
 </li>
 
 </ul>
-  
+
+***NOTE***
+<br>
+If you do not have Docker, the scripts will fall back to python and bash on your host.
+
 ### Docker artifacts
 Each of the above scripts will call run/miw_container.sh which will spin up a container based on the latest version of 'jaboo/miw' which is either stored locally or will be fetched from available at [Dockerhub](https://hub.docker.com/repository/docker/jaboo/miw). 
 
@@ -433,4 +603,5 @@ docker/clean_docker_artifacts.sh
 
 ### References
 [How to Use Linux Terminal in Windows 10](https://allthings.how/how-to-use-linux-terminal-in-windows-10/)<br>
-[Jupyter](https://jupyter.org/)
+[Jupyter](https://jupyter.org/)<br>
+[Running GUI's with Docker on OS X](https://www.youtube.com/watch?v=PKyj8sbZNYw&list=LL&index=4&t=6s)
