@@ -13,3 +13,10 @@ pyvenv.cfg
 lib64
 etc/
 share/
+Lib/
+Include/
+temp/
+activate
+*.exe
+*.bat
+*.ps1
