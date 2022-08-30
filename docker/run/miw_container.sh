@@ -7,7 +7,7 @@ nrOfArguments=${#argumentValues[@]}
 #  Image
 
 name="jaboo/miw"
-version="1.0-debian-slim"
+version="0.9"
 image="${name}:${version}"
 
 if [ $nrOfArguments -lt 1 ]; then
@@ -29,15 +29,17 @@ function makeWindowsProof {
     hostdirPics=$(cygpath -w -p ${hostdirPics})
     hostdirScripts=$(cygpath -w -p ${hostdirScripts})
     dockerPrefix="winpty "
+    # hostIP=$( ipconfig | grep IPv4 | sed 's/.*://' | tail -n1 | xargs)
+    export DISPLAY="${hostIP}:0"
+    # export DISPLAY="host.docker.internal:0.0"
 }
 
 function makeMacProof {
     # Support Apple M* processors
-    dockerPostfix="--platform linux/amd64"
+    dockerPostfix=" --platform linux/arm64/v8"
 
     # Set global variable DISPLAY to enable X Window System
     hostIP=$(ifconfig | grep 'inet ' | awk '{print $2}' | tail -n 1)
-    printf "hostIP : %s\n" "${hostIP}"
     export DISPLAY="${hostIP}:0"
     export LIBGL_ALLOW_SOFTWARE=1
 }
@@ -56,6 +58,9 @@ case "${os}" in
     *)          machine="UNKNOWN:${os}"
 esac
 
+printf "hostIP : [%s]\n" "${hostIP}"
+printf "dockerPostfix : [%s]\n" "${dockerPostfix}"
+
 export HOSTPATH_NOTEBOOKS=${hostdirNotebooks}
 export HOSTPATH_PICS=${hostdirPics}
 export HOSTPATH_PROJECT=${hostdirProjects}
@@ -72,10 +77,10 @@ containerdirProjects="${containerHome}/projects"
 containerdirPics="${containerHome}/pics"
 containerdirScripts="${containerHome}/scripts"
 composePath="docker/compose"
-graphicsParams="-v \"/tmp/.X11-unix:/tmp/.X11-unix\" -e \"DISPLAY=${DISPLAY}\" --net=host"
+graphicsParams="-v \"/tmp/.X11-unix:/tmp/.X11-unix:ro\" -e \"DISPLAY=${DISPLAY}\" --net=host"
 graphicsParams="-e \"DISPLAY=${DISPLAY}\" --net=host"
 
-cmd="${dockerPrefix}docker run ${dockerPostfix} -it --rm --name ${containerName}"
+cmd="${dockerPrefix}docker run -it --rm --name ${containerName}"
 cmd="${cmd} -v \"${hostdirNotebooks}:${containerdirNotebooks}\""
 cmd="${cmd} -v \"${hostdirPics}:${containerdirPics}\""
 cmd="${cmd} -v \"${hostdirProjects}:${containerdirProjects}\""
@@ -84,23 +89,23 @@ cmd="${cmd} -v \"${hostdirScripts}:${containerdirScripts}\""
 case "${mode}" in
     bash*)
         entryPoint="bash"
-        cmd="${cmd} --entrypoint ${entryPoint} ${image}";;
+        cmd="${cmd}${dockerPostfix} --entrypoint ${entryPoint} ${image}";;
     jupyter*)
-        version="latest"     
+        version="latest"
         composefile="${composePath}/python-ai-jupyter.yaml"
         export IMAGE=${image}
         export CONTAINER_NAME=${containerName}
         cmd="docker/compose/up.sh ${composefile}";;
     python-repl*)
         entryPoint="ptipython"
-        cmd="${cmd} --entrypoint ${entryPoint} ${image}";;        
+        cmd="${cmd} --entrypoint ${entryPoint} ${image}";;
     python-script*)
         entryPoint="run_script"
         cmd="${cmd} ${graphicsParams}"
         cmd="${cmd} -e SCRIPT=\"${argumentValues[1]}\" --entrypoint ${entryPoint} ${image}";;
     # Default
-    *)      
-        cmd="${cmd} ${image}";;        
+    *)
+        cmd="${cmd} ${image}";;
 esac
 
 printf "%s cmd : \n\t%s\n\n" "$0" "${cmd}"

@@ -9,7 +9,7 @@ if (! command -v ${runnable} &> /dev/null) then
     echo "Try locally installed jupyter"
     runnable="jupyter-lab"
 
-    if (! command -v ${runnable} &> /dev/null) then 
+    if (! command -v ${runnable} &> /dev/null) then
         echo "${runnable} could not be found"
         exit -1
     else
@@ -29,6 +29,6 @@ if [[ "${runnable}" == "docker" ]]; then
     if [ "${url}" != "" ]; then
         rm log.txt
         printf "Open %s in your browser\n" "${url}"
-        python -m webbrowser ${url}
+        python3 -m webbrowser ${url}
     fi
 fi
