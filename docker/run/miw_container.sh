@@ -6,7 +6,8 @@ nrOfArguments=${#argumentValues[@]}
 
 #  Image
 
-name="jaboo/miw"
+repo="jaboo"
+name="${repo}/miw"
 version="0.9"
 image="${name}:${version}"
 
@@ -36,7 +37,9 @@ function makeWindowsProof {
 
 function makeMacProof {
     # Support Apple M* processors
-    dockerPostfix=" --platform linux/arm64/v8"
+    arch=$(uname -m)
+    printf "Use architecture %s\n" "${arch}"
+    dockerPostfix=" --platform linux/${arch}"
 
     # Set global variable DISPLAY to enable X Window System
     hostIP=$(ifconfig | grep 'inet ' | awk '{print $2}' | tail -n 1)
@@ -91,8 +94,9 @@ case "${mode}" in
         entryPoint="bash"
         cmd="${cmd}${dockerPostfix} --entrypoint ${entryPoint} ${image}";;
     jupyter*)
-        version="latest"
         composefile="${composePath}/python-ai-jupyter.yaml"
+        version="0.1"
+        image="${repo}/miw-notebook:${version}"
         export IMAGE=${image}
         export CONTAINER_NAME=${containerName}
         cmd="docker/compose/up.sh ${composefile}";;
