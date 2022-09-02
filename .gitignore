@@ -15,3 +15,7 @@ pyvenv.cfg
 lib64
 etc/
 share/
+*.exe
+*.bat
+*.ps1
+pywin32*
