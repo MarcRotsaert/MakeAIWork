@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-=======
-#/usr/bin !/c/Users/marcr/AppData/Local/Microsoft/WindowsApps/python
-
->>>>>>> a2d8f5b (nieuw begin branch 220905)
 """
 1) Maak list A
 2) Maak list B
@@ -25,12 +20,7 @@ def multiply_vector(A,B):
     #print(C)
     return C
 A= (2,2,2);B=(4,5,8)
-<<<<<<< HEAD
 bla= multiply_vector(A,B)
 print(bla)
 
-=======
-b= multiply_vector(A,B)
-print(b)
->>>>>>> a2d8f5b (nieuw begin branch 220905)
 
