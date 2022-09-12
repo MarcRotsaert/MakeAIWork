@@ -45,7 +45,7 @@ function install_with_conda {
     installConda
   fi
 
-  conda install --yes -c conda-forge \
+  /c/ProgramData/Miniconda3/Scripts/conda install --yes -c conda-forge \
     beautifulsoup4 \
     py-cpuinfo \
     freeglut3 \

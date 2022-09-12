@@ -16,8 +16,10 @@ class World:
             print('time:{:>.3f}'.format(self.t))
             tm.sleep(self.dt/self.accellarator)
             finish =self.track.race(self.dt)
+            
             if finish==True:
                 self.running=False
+
                 #break #alternatief
             #self.stoppoef()
         #return t
