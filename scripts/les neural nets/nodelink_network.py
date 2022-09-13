@@ -24,7 +24,7 @@ class Link:
         self.node = node
 
 def softmax(outnodes):
-    total =0
+    #total =0
     temp=[]
     for node in outnodes:
         temp.append(math.exp(node.calculateOutput()))
