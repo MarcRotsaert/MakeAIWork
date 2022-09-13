@@ -20,3 +20,6 @@ share/
 *.bat
 *.ps1
 pywin32*
+env/
+simulations/
+log.txt
