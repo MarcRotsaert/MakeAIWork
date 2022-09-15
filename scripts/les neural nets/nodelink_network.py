@@ -1,15 +1,15 @@
 import math
 
-inputsets = (
+trainingsets = (
     ((1,1,1),
     (1,0,1),
     (1,1,1),
-    '0'),
+    'O'),
 
     ((0,1,0),
     (1,0,1),
     (0,1,0),
-    '0'),
+    'O'),
 
     ((0,1,0),
     (1,1,1),
@@ -22,7 +22,7 @@ inputsets = (
     'X'),
     )
 
-#scoretabel = {'O':[0,1],'X':[1,0]} # scoretabel 
+scoretabel = {'O':[0,1],'X':[1,0]} # scoretabel 
 class Node:
     def __init__(self,):
         self.val=None
@@ -88,61 +88,151 @@ class Neural():
             #    link 
 
 
-def softmax(trainingsets):
+def softmax(neur):
+    #genormaliseerde testscore op basis van resultaten neuraal netwerk
+    #softmaxl=[]
     #for tset in trainingsets:
+    #temp=[]
+    #for neur in neurals:
+    # neural1 = Neural()
+    # neural2 = Neural()
+    # neural3 = Neural()
+    # neural4 = Neural()
+    
+    #out1 = neur.calculaxteMatrix()
+    # out2 = neural2.calculateMatrix()
+    # out3 = neural3.calculateMatrix()
+    # out4 = neural4.calculateMatrix()
+        
+    mat = neur.calculateMatrix()
+    a=math.exp(mat[0])/(math.exp(mat[0])+math.exp(mat[1]))
+    b=math.exp(mat[1])/(math.exp(mat[0])+math.exp(mat[1]))
+    print(a)
+    print(b)
+    #softmaxl.append([a,b])
+    softmaxval = [a,b]#.append([a,b])
 
-        #total =0
-        #temp=[]
-        #for node in outnodes:
-        temp.append(math.exp(neural.calculateOutput()))
-        #print(temp[0]/sum(temp))
-        #print(temp[1]/sum(temp))
-    return softmaxlist
+    #softmaxl.append([math.exp([0]),
+    #                math.exp(neur.calculateMatrix()[1])])
+    #total =0
+    #temp=[]
+    #for node in outnodes:
+    #print(softmaxl[0][-1]**2/sum(softmaxl[0])**2)
+    #print(temp[1]**2/sum(temp)**2)
+    #print(temp[2]**2/sum(temp)**2)
+    #print(temp[3]**2/sum(temp)**2)
+    return softmaxval
 
-def costfunction(softmaxlist):
-    for rms in softmaxlist:
-        rms
-
+def costfunction(softmaxlist,trainingsets):
+    #hier ga je voor de vier testsituatie neuraal netwerk vergelijken met bhet 
+    cost=0
+    for i in range(len([softmaxlist])):
+        a = softmaxlist[i][0]-scoretabel[trainingsets[i][3]][0] # op O waarde 
+        b = softmaxlist[i][1]-scoretabel[trainingsets[i][3]][1] # op O waarde 
+        print(a)
+        print(b)
+        cost+=a**2+b**2
+        #cost+=b # op X-waarde 
+    return cost
 if __name__=='__main__':
     
     #def calculateoutnode   
-    print(trainingset)
     #startweightmatrix = 18*[1]
-    
-    for trainingset in inputsets:
-        neural= Neural()
-        outnodeX= Node()
-        outnodeO= Node()
-        neural.setOutnodes([outnodeX,outnodeO])
-        for tset in trainingset[1][:-1]: 
-            for val in tset:
-                # for val in row:
-                innode = Node()
-                innode.setInvalue(val)
-                inlinka = Link()
-                inlinkb = Link()
-                inlinka.setWeight(1)
-                inlinka.setInnode(innode)
-                inlinkb.setWeight(1)
-                inlinkb.setInnode(innode)
-                #if a>1:
-                outnodeX.setInlinks([inlinka])
-                #else:
-                outnodeO.setInlinks([inlinkb])
 
-        shape = trainingset[0][-1]        
-        neural.setShape(shape)
+
+    #for trainingset in trainingsets:
+    neurals=[]
+    softmaxl=[]
+
+    #for trainingset in trainingsets:
+    neural= Neural()
+    outnodeX= Node()
+    outnodeO= Node()
+    neural.setOutnodes([outnodeX,outnodeO])
+    for tset in trainingsets[0][:-1]: 
+        for val in tset:
+            inlinka = Link()
+            inlinkb = Link()
+            # for val in row:
+            innode = Node()
+            innode.setInvalue(val)
+            inlinka.setWeight(1)
+            inlinka.setInnode(innode)
+            inlinkb.setWeight(1)
+            inlinkb.setInnode(innode)
+            #if a>1:
+            outnodeX.setInlinks([inlinka])
+            #else:
+            outnodeO.setInlinks([inlinkb])
+
+    #softmaxl=[]
+    #for trainingset in trainingsets:
+        #neural= Neural()
+        #outnodeX= Node()
+        #outnodeO= Node()
+        #neural.setOutnodes([outnodeX,outnodeO])
+    #    i=0
+
+    #for trainingset in trainingsets:
+    #    for tset in trainingset[:-1]: 
+    #        for val in tset:
+                #inlinka = Link()
+                #inlinkb = Link()
+                # for val in row:
+                #innode = Node()
+                #innode.setInvalue(val)
+                #inlinka.setWeight(1)
+                #inlinka.setInnode(innode)
+                #inlinkb.setWeight(1)
+                #inlinkb.setInnode(innode)
+                #if a>1:
+                #outnodeX.setInlinks([inlinka])
+                #else:
+                #outnodeO.setInlinks([inlinkb])
+                #print(softmaxval)
+
+        #shape = trainingset[0][-1]        
+        #neural.setShape(shape)
+        #neurals.append(neural)
         #neural.outnode.setInlink(Link())
 
-        #innode=Node()
-        #innode.setInValue()
-        #    inlink = Link()
-    print(outnodeO)
-    print(outnodeX)
+    #neurals[0].outnodes[0].inlinks[0].setWeight(0.1)
+    neural.outnodes[0].inlinks[0].setWeight(10)
+    softmaxl=[]
+    for trainingset in trainingsets:
+        for tset in trainingset[:-1]: 
+            i=0
+            for val in tset:
+                neural.outnodes[0].inlinks[i].innode.setInvalue(val)
+                neural.outnodes[1].inlinks[i].innode.setInvalue(val)
+                i+=1
+        softmaxval=softmax(neural)
+        softmaxl.append(softmaxval)
+    out = costfunction(softmaxl,trainingsets)
+    print('c:',str(out))
+    
+    #softmaxl=softmax(neurals)
+    #print(softmaxl)
+    #print(outnodeX)
+    out = costfunction(softmaxl,trainingsets)
+    print('c:',str(out))
+   
+    #neurals[0].outnodes[0].inlinks[0].setWeight(10)
+    
+    
+    # softmaxl=softmax(neurals)
+    # out = costfunction(softmaxl,trainingsets)
+    # print('c:',str(out))
 
+    # neurals[0].outnodes[0].inlinks[0].setWeight(3)
+    # softmaxl=softmax(neurals)
+    # out = costfunction(softmaxl,trainingsets)
+    # print('c:',str(out))
+    
+    
     #neural = Neural()
-    print(len(neural.outnodes[0].inlinks))
-    print(neural.calculateMatrix())
+    #print(len(neural.outnodes[0].inlinks))
+    #print(neural.calculateMatrix())
     #neural.setWeightmatrix(startweightmatrix)
 
     #neural.inlinks.
