@@ -28,6 +28,14 @@ Nu volgen de loops
 """
 import random
 
+
+
+
+
+
+
+
+
 def make_random_matrixmultiplication():
     """
     Maak een matrix berekening, met volgende eigenschappen 
@@ -56,13 +64,16 @@ class Matrix:
     def __init__(self,rowlen,kollen):
         self.matrix=self._make_zero_matrix(rowlen,kollen)
         #self.matB=self._make_zero_matrix(kollen,rowlen)
+
     def _make_zero_matrix(self,rowlen=3,kollen=3):
         C=[]
         for t in range(rowlen):
             C.append([0 for y in range(kollen)])
         return C
 
-    def set_random_matrix(self,rowsize=3,kolsize=3):
+    
+
+    def set_random_matrix(self,):
         """
         Maak 2D matrix met afmeting rowsize bij kolsize.  
         """
@@ -84,6 +95,15 @@ class Matrix:
                 total=+val
         average  = total/(len(row)*len(self.matrix))
         return average
+
+    def add_matrix(self, matB ):
+        addmat = self._make_zero_matrix(len(matB.matrix),len(matB.matrix[0]))
+        for i in range(len(matB.matrix)):
+            for j in range(len(matB.matrix[i])):
+                addmat[i][j] =self.matrix[i][j]+matB.matrix[i][j]
+        return addmat
+
+            
 
     def multiply_matrix(self,matB):
         """
@@ -138,10 +158,14 @@ class Matrix:
         print("aantal kolommen = "+str(len(self.matrix[0])))
 
 if __name__=='__main__':
-    result = make_random_matrixmultiplication()
-    
-    print(result)
+
     import pprint
+
+    if False:
+        result = make_random_matrixmultiplication()
+        resultcopy = result.copy()
+        result
+        print(result)
     if False:
         #F = make_zero_matrix(5,3)
         matresult = make_random_matrixmultiplication()
@@ -151,14 +175,32 @@ if __name__=='__main__':
         print(average)
         print_matsize(matresult)
 
-        if False:
-            A = set_random_matrix(50,30)
-            B = set_random_matrix(30,20)
-            b= multiply_matrix(A,B)
-            average = calculate_average_matrix(b)
-            pprint.pprint(b)
-            print(average)
+    if True:
+            A = Matrix(50,40)
+            A.set_random_matrix()
+            B = Matrix(50,40)
+            B.set_random_matrix()
+            A.add_matrix(B)
+            b= A.add_matrix(B)
+
+            print(b[20][20])
+            print(A.matrix[20][20])
+            print(B.matrix[20][20])
+            #average = calculate_average_matrix(b)
+            #pprint.pprint(b)
+            #print(average)
             print_matsize(b)
+
+
+
+    if False:
+        A = set_random_matrix(50,30)
+        B = set_random_matrix(30,20)
+        b= multiply_matrix(A,B)
+        average = calculate_average_matrix(b)
+        pprint.pprint(b)
+        print(average)
+        print_matsize(b)
 """
     A = ((2,2,2),
         (3,3,3),
