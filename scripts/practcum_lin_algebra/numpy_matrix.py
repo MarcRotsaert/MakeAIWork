@@ -1,7 +1,8 @@
 import os
-from class_matrix import Matrix
+#from class_matrix import Matrix
 import numpy as np
 import pprint
+import random
 
 if False:
     A = Matrix(50,40)
@@ -15,6 +16,20 @@ if False:
     result_np = A_np+B_np
     pprint.pprint(result_np)
 
+class Matrix:
+    def __init__(self,rowlen,kollen):
+        self.matrix = self._make_zero_matrix(rowlen,kollen)
+
+    def _make_zero_matrix(self,rowlen=3,kollen=3):
+        return np.zeros([rowlen,kollen])
+
+    def set_random_matrix(self,):
+        self.matrix=np.random.rand(self.matrix.shape[0],self.matrix.shape[1])
+
+    def add_matrix(self, matB ):
+        return self.matrix+self.matrixB
+    def multiply_matrix(self, matB ):
+        return np.dot(self.matrix,matB.matrix)
 
 A = Matrix(10,20)
 A.set_random_matrix()
