@@ -41,7 +41,7 @@ class Employee:
         print(f"Annual salary of {employee2.getFullname()} : {employee2.annualSalary}")
         print(f"__name__: {__name__}")
 
-    if __name__ == "main":
+    if __name__ == "__main__":
         main()
 
 Employee.main()
