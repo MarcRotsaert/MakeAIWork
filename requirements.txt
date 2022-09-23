@@ -1,1 +1,4 @@
 pandas
+tensorflow
+tensorboard-plugin-wit
+tensorflow-estimator 
