@@ -31,6 +31,7 @@ import math as mt
 import sys as ss
 import os
 import socket as sc
+import time 
 
 print(os.chdir(r'C:\Users\marcr\MakeAIWork\simpylc\simulations\car\control_client'))
 print(ss.path[0])
@@ -42,10 +43,11 @@ ss.path.append(r'C:\Users\marcr\MakeAIWork\simpylc\simulations\car')
 ss.path +=  [os.path.abspath (relPath) for relPath in  ('..',)] 
 
 import socket_wrapper as sw
-import parameters as pm
+import parameters_sonar as pm
 
 class HardcodedClient:
     def __init__ (self):
+        starttime = time.time()
         self.steeringAngle = 0
 
         with open (pm.sampleFileName, 'w') as self.sampleFile:
@@ -54,7 +56,9 @@ class HardcodedClient:
                 self.socketWrapper = sw.SocketWrapper (self.clientSocket)
                 self.halfApertureAngle = False
 
-                while True:
+                #while True:
+                while time.time()-starttime<60:
+
                     """
                     continu loop, waarbij heen en weer gecommuniceerd wordt met de simPylc.
                     sweep-function wordt bijgestuurd. 
@@ -80,8 +84,8 @@ class HardcodedClient:
         #    print(sensors.keys(),'w',file=file)
         #xx
         if not self.halfApertureAngle:
-            self.halfApertureAngle = sensors ['halfApertureAngle'] # helft van de openingshoek
-            self.sectorAngle = 2 * self.halfApertureAngle / pm.lidarInputDim  # hoek van de sector van de lidar
+            self.halfApertureAngle = sensors ['halfApertureAngle']
+            self.sectorAngle = 2 * self.halfApertureAngle / pm.lidarInputDim
             self.halfMiddleApertureAngle = sensors ['halfMiddleApertureAngle']
         
         with open('C:/temp/sensor3.txt','w') as file: 
@@ -104,10 +108,7 @@ class HardcodedClient:
         
         nextObstacleDistance = pm.finity
         nextObstacleAngle = 0
-        
-        # Je gaat door alle lidar gegevens tussen -60 en +60 
-        # Daarmee bepaal je de dichtsbijzijnde en de een na dichtstbijzijnde pion. 
-        # Dit gebruik je voor het bepalen van de stuurhoek.
+
         for lidarAngle in range (-self.halfApertureAngle, self.halfApertureAngle):
             lidarDistance = self.lidarDistances [lidarAngle]
             
@@ -124,7 +125,7 @@ class HardcodedClient:
            
         targetObstacleDistance = (nearestObstacleDistance + nextObstacleDistance) / 2
 
-        self.steeringAngle = (nearestObstacleAngle + nextObstacleAngle) / 2 
+        self.steeringAngle = (nearestObstacleAngle + nextObstacleAngle) / 2
         self.targetVelocity = pm.getTargetVelocity (self.steeringAngle)
 
     def sonarSweep (self):
