@@ -25,13 +25,17 @@ It is meant for training purposes only.
 Removing this header ends your license.
 '''
 
+from pickletools import float8
 import time as tm
-import traceback as tb
-import math as mt
+#import traceback as tb
+#import math as mt
 import sys as ss
 import os
 import socket as sc
-import time 
+import time
+
+import tensorflow as tf
+import numpy as np
 
 print(os.chdir(r'C:\Users\marcr\MakeAIWork\simpylc\simulations\car\control_client'))
 print(ss.path[0])
@@ -43,22 +47,24 @@ ss.path.append(r'C:\Users\marcr\MakeAIWork\simpylc\simulations\car')
 ss.path +=  [os.path.abspath (relPath) for relPath in  ('..',)] 
 
 import socket_wrapper as sw
-import parameters_sonar as pm
+import parameters_sonarai as pm
 
-class HardcodedClient:
+class AIClient:
     def __init__ (self):
-        starttime = time.time()
+        aiModel = r'C:\Users\marcr\MakeAIWork\simpylc\tensorflow\test_tf2_v1'
+        
+        # laden model kost veel tijd. Dus dit moet je hier doen. 
+        # De prediction eruit halen kost minder tijd.  
+        self.aimodel = tf.keras.models.load_model(aiModel) 
         self.steeringAngle = 0
-
+        starttime = time.time()
         with open (pm.sampleFileName, 'w') as self.sampleFile:
             with sc.socket (*sw.socketType) as self.clientSocket:
                 self.clientSocket.connect (sw.address)
                 self.socketWrapper = sw.SocketWrapper (self.clientSocket)
                 self.halfApertureAngle = False
 
-                #while True:
                 while time.time()-starttime<180:
-
                     """
                     continu loop, waarbij heen en weer gecommuniceerd wordt met de simPylc.
                     sweep-function wordt bijgestuurd. 
@@ -78,8 +84,8 @@ class HardcodedClient:
             sonar halfapartureangle     60
 
         """    
-
         sensors = self.socketWrapper.recv ()
+        assert 'sonarDistances' in sensors, 'speciaal voor sonar gemaakt'
         #with open('C:/temp/sensor.txt','w') as file: 
         #    print(sensors.keys(),'w',file=file)
         #xx
@@ -103,6 +109,8 @@ class HardcodedClient:
         """"
         Aanpassing van de sturing voor Lidar
         """
+    
+        
         nearestObstacleDistance = pm.finity
         nearestObstacleAngle = 0
         
@@ -129,31 +137,39 @@ class HardcodedClient:
         self.targetVelocity = pm.getTargetVelocity (self.steeringAngle)
 
     def sonarSweep (self):
-        """Aanpassing van de sturing voor Sonar"""
 
-        obstacleDistances = [pm.finity for sectorIndex in range (3)]
-        obstacleAngles = [0 for sectorIndex in range (3)]
+        """Aansturing voor Sonar. Dit wordt aangepakt 
         
-        for sectorIndex in (-1, 0, 1): #loop door 3 sectoren 
-            sonarDistance = self.sonarDistances [sectorIndex] 
-            sonarAngle = 2 * self.halfMiddleApertureAngle * sectorIndex
+        """
+
+        steeringangle = self.aimodel.predict(np.array([self.sonarDistances]))
+        #print(steeringangle)
+        self.steeringAngle = float(steeringangle[0][0])
+
+        if False:
+            obstacleDistances = [pm.finity for sectorIndex in range (3)]
+            obstacleAngles = [0 for sectorIndex in range (3)]
             
-            if sonarDistance < obstacleDistances [sectorIndex]:
-                obstacleDistances [sectorIndex] = sonarDistance
-                obstacleAngles [sectorIndex] = sonarAngle
+            for sectorIndex in (-1, 0, 1): #loop door 3 sectoren 
+                sonarDistance = self.sonarDistances [sectorIndex] 
+                sonarAngle = 2 * self.halfMiddleApertureAngle * sectorIndex
+                
+                if sonarDistance < obstacleDistances [sectorIndex]:
+                    obstacleDistances [sectorIndex] = sonarDistance
+                    obstacleAngles [sectorIndex] = sonarAngle
 
-        # Bepalen of naar links of rechts of niet gedraaid wordt.
-        if obstacleDistances [-1] > obstacleDistances [0]:
-            leftIndex = -1
-        else:
-            leftIndex = 0
-           
-        if obstacleDistances [1] > obstacleDistances [0]:
-            rightIndex = 1
-        else:
-            rightIndex = 0
+            # Bepalen of naar links of rechts of niet gedraaid wordt.
+            if obstacleDistances [-1] > obstacleDistances [0]:
+                leftIndex = -1
+            else:
+                leftIndex = 0
+            
+            if obstacleDistances [1] > obstacleDistances [0]:
+                rightIndex = 1
+            else:
+                rightIndex = 0
         
-        self.steeringAngle = (obstacleAngles [leftIndex] + obstacleAngles [rightIndex]) / 2
+            self.steeringAngle = (obstacleAngles [leftIndex] + obstacleAngles [rightIndex]) / 2
         self.targetVelocity = pm.getTargetVelocity (self.steeringAngle)
 
     def sweep (self):
@@ -209,4 +225,5 @@ class HardcodedClient:
         else:
             self.logSonarTraining ()
 
-HardcodedClient ()
+#HardcodedClient ()
+AIClient ()

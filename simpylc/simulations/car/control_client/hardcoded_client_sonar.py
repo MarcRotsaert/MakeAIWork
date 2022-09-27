@@ -55,7 +55,7 @@ class HardcodedClient:
                 self.socketWrapper = sw.SocketWrapper (self.clientSocket)
                 self.halfApertureAngle = False
 
-                while time.time()-starttime<60:
+                while time.time()-starttime<180:
                     """
                     continu loop, waarbij heen en weer gecommuniceerd wordt met de simPylc.
                     sweep-function wordt bijgestuurd. 
@@ -150,9 +150,10 @@ class HardcodedClient:
         else:
             rightIndex = 0
         
+
         self.steeringAngle = (obstacleAngles [leftIndex] + obstacleAngles [rightIndex]) / 2
         self.targetVelocity = pm.getTargetVelocity (self.steeringAngle)
-
+        #print(self.steeringAngle)
     def sweep (self):
         if hasattr (self, 'lidarDistances'):
             self.lidarSweep ()
