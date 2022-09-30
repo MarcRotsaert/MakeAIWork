@@ -33,7 +33,7 @@ import sys as ss
 import os
 cur_dir = os.getcwd()
 print(cur_dir)
-xx
+
 import socket as sc
 import time
 
