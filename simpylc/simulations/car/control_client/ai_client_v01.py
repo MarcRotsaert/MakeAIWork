@@ -31,10 +31,15 @@ import time as tm
 #import math as mt
 import sys as ss
 import os
+cur_dir = os.getcwd()
+print(cur_dir)
+xx
 import socket as sc
 import time
 
 import tensorflow as tf
+import sklearn
+import pickle
 import numpy as np
 
 print(os.chdir(r'C:\Users\marcr\MakeAIWork\simpylc\simulations\car\control_client'))
@@ -49,16 +54,31 @@ ss.path +=  [os.path.abspath (relPath) for relPath in  ('..',)]
 import socket_wrapper as sw
 import parameters_ai as pm
 
-aiModellidar = r'C:/temp/lidar_tf2_v2'
-aiModelsonar = r'C:\Users\marcr\MakeAIWork\simpylc\tensorflow\test_tf2_v1'
+aiModellidar_scikit = r'C:/temp/scikit_v1'
+aiModelsonar_scikit = r'C:/temp/scikit_sonar_v1'
+aiModelsonar_tensorflow = r'C:\Users\marcr\MakeAIWork\simpylc\tensorflow\test_tf2_v1'
+aiModellidar_tensorflow = r'C:/temp/lidar.samples_groep2'
 
 
 class AIClient:
     def __init__ (self):
+        
+        mt = None
+        while mt not in ['t', 's']: 
+            mt = input('welk model kies je: scikit[s] of tensorflow[t]?')
+            if mt not in ['t', 's']:
+                print('Hallo hé: kies een t of een s!!!')        
         #aiModel = r'C:\Users\marcr\MakeAIWork\simpylc\tensorflow\test_tf2_v1'
-        self.aimodel = None 
+        
+        self.mt = mt
+        self.aimodel=None
+        #if mt =='t'
+        #    self.mt='t'
+            #self.aimodel = tf.keras.models.load_model(aiModel) 
+        #elif mt=='s'
+        #    self.mt='s'
+            #self.aimodel = pickle.load(open('C:/temp/pickle_')) 
         #aiModel = r'C:\Users\marcr\MakeAIWork\simpylc\tensorflow\test_tf2_v1'
-        #self.aimodel = tf.keras.models.load_model(aiModel) 
         
         # laden model kost veel tijd. Dus dit moet je hier doen. 
         # De prediction eruit halen kost minder tijd.  
@@ -90,7 +110,6 @@ class AIClient:
         
             sonar halfmiddleapartureangle     22
             sonar halfapartureangle     60
-
         """    
         sensors = self.socketWrapper.recv ()
         #assert 'sonarDistances' in sensors, 'speciaal voor sonar gemaakt'
@@ -115,15 +134,21 @@ class AIClient:
             #xx
             self.lidarDistances = sensors ['lidarDistances']
             if self.aimodel==None:
-                #aiModel = r'C:/temp/lidar_tf2_v1'
-                self.aimodel = tf.keras.models.load_model(aiModellidar)
-         
+                if self.mt=='t':
+                    #aiModel = r'C:/temp/lidar_tf2_v1'
+                    self.aimodel = tf.keras.models.load_model(aiModellidar_tensorflow)
+                elif self.mt=='s':
+                    self.aimodel = pickle.load(open(aiModellidar_scikit,'rb'))
         else:
             print('noooooooooooooooooooo')
             self.sonarDistances = sensors ['sonarDistances']
             if self.aimodel==None:
-                #aiModel = r'C:\Users\marcr\MakeAIWork\simpylc\tensorflow\test_tf2_v1'
-                self.aimodel = tf.keras.models.load_model(aiModelsonar) 
+                if self.mt=='t':
+                    self.aimodel = tf.keras.models.load_model(aiModelsonar_tensorflow)
+                    #self.aimodel = tf.keras.models.load_model(aiModelsonar) 
+                elif self.mt=='s':
+                    self.aimodel = pickle.load(open(aiModelsonar_scikit,'rb'))
+                    #aiModel = r'C:\Users\marcr\MakeAIWork\simpylc\tensorflow\test_tf2_v1'
 
     def lidarSweep (self):
         """"
@@ -165,7 +190,10 @@ class AIClient:
         steeringangle = self.aimodel.predict(np.array([sample]))
         #print(steeringangle)
         #xx
-        self.steeringAngle = float(steeringangle[0][0])
+        try:
+            self.steeringAngle = float(steeringangle[0][0])
+        except:
+            self.steeringAngle = float(steeringangle[0])
         self.targetVelocity = pm.getTargetVelocity (self.steeringAngle)
         #print(self.targetVelocity)
 
@@ -177,7 +205,10 @@ class AIClient:
 
         steeringangle = self.aimodel.predict(np.array([self.sonarDistances]))
         #print(steeringangle)
-        self.steeringAngle = float(steeringangle[0][0])
+        try:
+            self.steeringAngle = float(steeringangle[0][0])
+        except:
+            self.steeringAngle = float(steeringangle[0])
 
         if False:
             obstacleDistances = [pm.finity for sectorIndex in range (3)]

@@ -1,4 +1,3 @@
-from tokenize import triple_quoted
 import tensorflow as tf
 import numpy as np
 import os
@@ -6,8 +5,16 @@ import os
 from matplotlib import pyplot as pp
 
 path_input = r'C:\Users\marcr\MakeAIWork\simpylc\simulations\car\control_client'
-lidar_input = 'lidar.samples_v1'
+if False:
+    lidar_input = 'lidar.samples_v1'
+    outputpath ='C:/temp/lidar_tf2_v2'
+if True:
+    lidar_input = 'lidar.samples_v1'
+    outputpath ='C:/temp/lidar.samples_groep2'
 lidar_array = np.genfromtxt(os.path.join(path_input,lidar_input))
+    
+    
+
 
 #10 procent reserveren voor validatie
 i = lidar_array.shape[0]//10
@@ -272,7 +279,7 @@ if True:
 
     for optmzr in optimizers:
         model = fittester4(lf,optmzr,nrepochs)
-    model.save('C:/temp/lidar_tf2_v2')
+    model.save(outputpath)
 
     #steering_prediction = model.predict(np.array(lidardata_val))
     steering_prediction = model.predict(np.array(lidardata))

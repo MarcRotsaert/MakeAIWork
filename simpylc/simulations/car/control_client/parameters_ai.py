@@ -25,7 +25,7 @@ It is meant for training purposes only.
 Removing this header ends your license.
 '''
 
-finity = 20.0   # Needs to be float to obtain ditto numpy array
+finity = 20.0   # Needs to be float to obtaqin ditto numpy array
 
 lidarInputDim = 16
 sonarInputDim = 3
@@ -34,4 +34,4 @@ sampleFileName = 'ai.samples'
 
 def getTargetVelocity (steeringAngle):
     return (90 - abs (steeringAngle)) / 60
-    #return (70 - abs (steeringAngle)) / 60
+    #return (70 - abs (steringAngle)) / 60
