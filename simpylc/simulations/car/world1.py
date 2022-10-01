@@ -30,8 +30,15 @@ import sys as ss
 import time as tm
 
 ss.path +=  [os.path.abspath (relPath) for relPath in  ('../../..', '..')]   # If you want to store your simulations somewhere else, put SimPyLC in your PYTHONPATH environment variable
-scannerType = 'lidar' if input ('Lidar or sonar <l/s>: ') == 'l' else 'sonar'  # Should be done prior to any SimPyLC related imports due to concurrency
-#scannerType='lidar'
+
+#scannerType = 'lidar' if input ('Lidar or sonar <l/s>: ') == 'l' else 'sonar'  # Should be done prior to any SimPyLC related imports due to concurrency
+if ss.argv[1] =='l':
+    scannerType = 'lidar'
+elif ss.argv[1]=='s':
+    scannerType = 'sonar'
+else:
+    xx
+
 
 import simpylc as sp
 
