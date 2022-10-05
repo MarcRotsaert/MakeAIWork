@@ -22,3 +22,5 @@ pywin32*
 env/
 log.txt
 simpylc/tensorflow/keras_tuner
+simpylc/tensorflow/old
+old/

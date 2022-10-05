@@ -1,4 +1,4 @@
-'''
+"""
 ====== Legal notices
 
 Copyright (C) 2013 - 2021 GEATEC engineering
@@ -23,7 +23,7 @@ __________________________________________________________________________
 It is meant for training purposes only.
 
 Removing this header ends your license.
-'''
+"""
 
 import time as tm
 import traceback as tb
@@ -32,180 +32,190 @@ import sys as ss
 import os
 import socket as sc
 
-print(os.chdir(r'C:\Users\marcr\MakeAIWork\simpylc\simulations\car\control_client'))
+print(os.chdir(r"C:\Users\marcr\MakeAIWork\simpylc\simulations\car\control_client"))
 print(ss.path[0])
 # for relpath in ('..',):
 #     print(os.path.abspath (relpath))
 #     ss.path+=[os.path.abspath (relpath)]
 
-ss.path.append(r'C:\Users\marcr\MakeAIWork\simpylc\simulations\car')
-ss.path +=  [os.path.abspath (relPath) for relPath in  ('..',)] 
+ss.path.append(r"C:\Users\marcr\MakeAIWork\simpylc\simulations\car")
+ss.path += [os.path.abspath(relPath) for relPath in ("..",)]
 
 import socket_wrapper as sw
 import parameters as pm
 
+
 class HardcodedClient:
-    def __init__ (self):
+    def __init__(self):
         self.steeringAngle = 0
 
-        with open (pm.sampleFileName, 'w') as self.sampleFile:
-            with sc.socket (*sw.socketType) as self.clientSocket:
-                self.clientSocket.connect (sw.address)
-                self.socketWrapper = sw.SocketWrapper (self.clientSocket)
+        with open(pm.sampleFileName, "w") as self.sampleFile:
+            with sc.socket(*sw.socketType) as self.clientSocket:
+                self.clientSocket.connect(sw.address)
+                self.socketWrapper = sw.SocketWrapper(self.clientSocket)
                 self.halfApertureAngle = False
 
                 while True:
                     """
                     continu loop, waarbij heen en weer gecommuniceerd wordt met de simPylc.
-                    sweep-function wordt bijgestuurd. 
+                    sweep-function wordt bijgestuurd.
                     """
-                    self.input ()
-                    self.sweep ()
-                    self.output ()
-                    self.logTraining ()
-                    tm.sleep (0.02) # sleep om niet te snel te reageren
+                    self.input()
+                    self.sweep()
+                    self.output()
+                    self.logTraining()
+                    tm.sleep(0.02)  # sleep om niet te snel te reageren
 
-    def input (self):
+    def input(self):
         """
         Ontvangen van gegevens uit simpylc. De volgende gegevens komen er uit:
         'halfApertureAngle', 'halfMiddleApertureAngle', '[lidar/sonar]Distances'
-        
+
             sonar halfmiddleapartureangle     22
             sonar halfapartureangle     60
 
-        """    
+        """
 
-        sensors = self.socketWrapper.recv ()
-        #with open('C:/temp/sensor.txt','w') as file: 
+        sensors = self.socketWrapper.recv()
+        # with open('C:/temp/sensor.txt','w') as file:
         #    print(sensors.keys(),'w',file=file)
-        #xx
+        # xx
         if not self.halfApertureAngle:
-            self.halfApertureAngle = sensors ['halfApertureAngle'] # helft van de openingshoek
-            self.sectorAngle = 2 * self.halfApertureAngle / pm.lidarInputDim  # hoek van de sector van de lidar
-            self.halfMiddleApertureAngle = sensors ['halfMiddleApertureAngle']
-        
-        with open('C:/temp/sensor3.txt','w') as file: 
-            print('lidar halfmiddleapartureangle',file=file)
-            print(sensors['halfMiddleApertureAngle'],'w',file=file)
-            print('lidar halfapartureangle',file=file)
-            print(sensors['halfApertureAngle'],'w',file=file)
-        #xx
-        if 'lidarDistances' in sensors:
-            self.lidarDistances = sensors ['lidarDistances']
-        else:
-            self.sonarDistances = sensors ['sonarDistances']
+            self.halfApertureAngle = sensors[
+                "halfApertureAngle"
+            ]  # helft van de openingshoek
+            self.sectorAngle = (
+                2 * self.halfApertureAngle / pm.lidarInputDim
+            )  # hoek van de sector van de lidar
+            self.halfMiddleApertureAngle = sensors["halfMiddleApertureAngle"]
 
-    def lidarSweep (self):
-        """"
+        with open("C:/temp/sensor3.txt", "w") as file:
+            print("lidar halfmiddleapartureangle", file=file)
+            print(sensors["halfMiddleApertureAngle"], "w", file=file)
+            print("lidar halfapartureangle", file=file)
+            print(sensors["halfApertureAngle"], "w", file=file)
+        # xx
+        if "lidarDistances" in sensors:
+            self.lidarDistances = sensors["lidarDistances"]
+        else:
+            self.sonarDistances = sensors["sonarDistances"]
+
+    def lidarSweep(self):
+        """ "
         Aanpassing van de sturing voor Lidar
         """
         nearestObstacleDistance = pm.finity
         nearestObstacleAngle = 0
-        
+
         nextObstacleDistance = pm.finity
         nextObstacleAngle = 0
-        
-        # Je gaat door alle lidar gegevens tussen -60 en +60 
-        # Daarmee bepaal je de dichtsbijzijnde en de een na dichtstbijzijnde pion. 
+
+        # Je gaat door alle lidar gegevens tussen -60 en +60
+        # Daarmee bepaal je de dichtsbijzijnde en de een na dichtstbijzijnde pion.
         # Dit gebruik je voor het bepalen van de stuurhoek.
-        for lidarAngle in range (-self.halfApertureAngle, self.halfApertureAngle):
-            lidarDistance = self.lidarDistances [lidarAngle]
-            
+        for lidarAngle in range(-self.halfApertureAngle, self.halfApertureAngle):
+            lidarDistance = self.lidarDistances[lidarAngle]
+
             if lidarDistance < nearestObstacleDistance:
-                nextObstacleDistance =  nearestObstacleDistance
+                nextObstacleDistance = nearestObstacleDistance
                 nextObstacleAngle = nearestObstacleAngle
-                
-                nearestObstacleDistance = lidarDistance 
+
+                nearestObstacleDistance = lidarDistance
                 nearestObstacleAngle = lidarAngle
 
             elif lidarDistance < nextObstacleDistance:
                 nextObstacleDistance = lidarDistance
                 nextObstacleAngle = lidarAngle
-           
+
         targetObstacleDistance = (nearestObstacleDistance + nextObstacleDistance) / 2
 
-        self.steeringAngle = (nearestObstacleAngle + nextObstacleAngle) / 2 
-        self.targetVelocity = pm.getTargetVelocity (self.steeringAngle)
+        self.steeringAngle = (nearestObstacleAngle + nextObstacleAngle) / 2
+        self.targetVelocity = pm.getTargetVelocity(self.steeringAngle)
 
-    def sonarSweep (self):
+    def sonarSweep(self):
         """Aanpassing van de sturing voor Sonar"""
 
-        obstacleDistances = [pm.finity for sectorIndex in range (3)]
-        obstacleAngles = [0 for sectorIndex in range (3)]
-        
-        for sectorIndex in (-1, 0, 1): #loop door 3 sectoren 
-            sonarDistance = self.sonarDistances [sectorIndex] 
+        obstacleDistances = [pm.finity for sectorIndex in range(3)]
+        obstacleAngles = [0 for sectorIndex in range(3)]
+
+        for sectorIndex in (-1, 0, 1):  # loop door 3 sectoren
+            sonarDistance = self.sonarDistances[sectorIndex]
             sonarAngle = 2 * self.halfMiddleApertureAngle * sectorIndex
-            
-            if sonarDistance < obstacleDistances [sectorIndex]:
-                obstacleDistances [sectorIndex] = sonarDistance
-                obstacleAngles [sectorIndex] = sonarAngle
+
+            if sonarDistance < obstacleDistances[sectorIndex]:
+                obstacleDistances[sectorIndex] = sonarDistance
+                obstacleAngles[sectorIndex] = sonarAngle
 
         # Bepalen of naar links of rechts of niet gedraaid wordt.
-        if obstacleDistances [-1] > obstacleDistances [0]:
+        if obstacleDistances[-1] > obstacleDistances[0]:
             leftIndex = -1
         else:
             leftIndex = 0
-           
-        if obstacleDistances [1] > obstacleDistances [0]:
+
+        if obstacleDistances[1] > obstacleDistances[0]:
             rightIndex = 1
         else:
             rightIndex = 0
-        
-        self.steeringAngle = (obstacleAngles [leftIndex] + obstacleAngles [rightIndex]) / 2
-        self.targetVelocity = pm.getTargetVelocity (self.steeringAngle)
 
-    def sweep (self):
-        if hasattr (self, 'lidarDistances'):
-            self.lidarSweep ()
+        self.steeringAngle = (
+            obstacleAngles[leftIndex] + obstacleAngles[rightIndex]
+        ) / 2
+        self.targetVelocity = pm.getTargetVelocity(self.steeringAngle)
+
+    def sweep(self):
+        if hasattr(self, "lidarDistances"):
+            self.lidarSweep()
         else:
-            self.sonarSweep ()
+            self.sonarSweep()
 
-    def output (self):
+    def output(self):
         """
         communicatie richting simpylc.
         Je stuurt een aangepaste stuurhoek en een doelsnelheid.
         """
-        
+
         actuators = {
-            'steeringAngle': self.steeringAngle,
-            'targetVelocity': self.targetVelocity
+            "steeringAngle": self.steeringAngle,
+            "targetVelocity": self.targetVelocity,
         }
 
-        self.socketWrapper.send (actuators)
+        self.socketWrapper.send(actuators)
 
-    def logLidarTraining (self):
+    def logLidarTraining(self):
         """
-        logging van lidargegevens, namelijk:  
+        logging van lidargegevens, namelijk:
             per sector 1 kolom met dichtste afstand tov een object.
-        
+
         naam logfile staat in parameter.py
-        pm.finity => default maximum voor afstand tov object.   
+        pm.finity => default maximum voor afstand tov object.
 
         """
 
-        sample = [pm.finity for entryIndex in range (pm.lidarInputDim + 1)]
+        sample = [pm.finity for entryIndex in range(pm.lidarInputDim + 1)]
 
-        for lidarAngle in range (-self.halfApertureAngle, self.halfApertureAngle):
-            sectorIndex = round (lidarAngle / self.sectorAngle)
-            sample [sectorIndex] = min (sample [sectorIndex], self.lidarDistances [lidarAngle])
+        for lidarAngle in range(-self.halfApertureAngle, self.halfApertureAngle):
+            sectorIndex = round(lidarAngle / self.sectorAngle)
+            sample[sectorIndex] = min(
+                sample[sectorIndex], self.lidarDistances[lidarAngle]
+            )
 
-        sample [-1] = self.steeringAngle
-        print (*sample, file = self.sampleFile)
+        sample[-1] = self.steeringAngle
+        print(*sample, file=self.sampleFile)
 
-    def logSonarTraining (self):
-        sample = [pm.finity for entryIndex in range (pm.sonarInputDim + 1)]
+    def logSonarTraining(self):
+        sample = [pm.finity for entryIndex in range(pm.sonarInputDim + 1)]
 
         for entryIndex, sectorIndex in ((2, -1), (0, 0), (1, 1)):
-            sample [entryIndex] = self.sonarDistances [sectorIndex]
+            sample[entryIndex] = self.sonarDistances[sectorIndex]
 
-        sample [-1] = self.steeringAngle
-        print (*sample, file = self.sampleFile)
+        sample[-1] = self.steeringAngle
+        print(*sample, file=self.sampleFile)
 
-    def logTraining (self):
-        if hasattr (self, 'lidarDistances'):
-            self.logLidarTraining ()
+    def logTraining(self):
+        if hasattr(self, "lidarDistances"):
+            self.logLidarTraining()
         else:
-            self.logSonarTraining ()
+            self.logSonarTraining()
 
-HardcodedClient ()
+
+HardcodedClient()
